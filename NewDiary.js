@@ -92,9 +92,21 @@ class DownBox extends Component {
 export default class NewDiary extends Component {
     state = {
         date: new Date(),
-        content: 'datePicker',
+        type: 'datePicker',
         pubHole: false,
-        showdownBox: false
+        showdownBox: false,
+        startSaveDiary: false,
+    }
+    saveDiary = ({ title, content }) => {
+        const date = formatDate(this.state.date, 'yyyy') + '-' + formatDate(this.state.date, 'mm') + '-' + formatDate(this.state.date, 'dd')
+        const holeAlive = this.state.pubHole ? Date.now() + 48 * 3600000 : -1
+        const data = {
+            date,
+            title,
+            content,
+            holeAlive
+        }
+        console.log(data)
     }
     _renderPrivacy() {
         const items = [
@@ -110,11 +122,14 @@ export default class NewDiary extends Component {
             }
         ]
         return (
-            items.map((item) => (
-                <View style={[
-                    styles.flex_between,
-                    { marginBottom: item.icon === 'friends' ? getResponsiveWidth(35) : 0 }
-                ]}>
+            items.map((item, i) => (
+                <View
+                   key={i}
+                   style={[
+                     styles.flex_between,
+                     { marginBottom: item.icon === 'friends' ? getResponsiveWidth(35) : 0 }
+                   ]}
+                >
                     <View style={styles.flex_start}>
                         <View>
                             <Image
@@ -164,7 +179,7 @@ export default class NewDiary extends Component {
                 >
                     <View style={styles.date_picker}>
                         {
-                            this.state.content === 'datePicker' ?
+                            this.state.type === 'datePicker' ?
                             <DatePickerIOS
                                 locale={'zh-Hans'}
                                 style={styles.date_picker}
@@ -183,7 +198,7 @@ export default class NewDiary extends Component {
                     <View style={styles.flex_start}>
                         <TouchableOpacity onPress={() => {
                             this.setState({
-                                content: 'datePicker',
+                                type: 'datePicker',
                                 showdownBox: true
                             })
                         }}>
@@ -200,7 +215,7 @@ export default class NewDiary extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
                             this.setState({
-                                content: 'privacy',
+                                type: 'privacy',
                                 showdownBox: true
                             })
                         }}>
@@ -215,13 +230,22 @@ export default class NewDiary extends Component {
                             </View>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                       onPress={() => {
+                           this.setState({
+                               startSaveDiary: true
+                           })
+                       }}
+                    >
                         <View>
                             <Image source={require('./images/done.png')} />
                         </View>
                     </TouchableOpacity>
                 </View>
-                <Editor />
+                <Editor
+                   saveDiary={this.saveDiary}
+                   startSaveDiary={this.state.startSaveDiary}
+                />
             </Container>
         )
     }

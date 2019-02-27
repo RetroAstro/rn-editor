@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {ListView, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {ListView, View, TouchableOpacity, Image} from 'react-native';
 import {actions} from './const';
 
 const defaultActions = [
@@ -13,14 +13,14 @@ const defaultActions = [
 ];
 
 function getDefaultIcon() {
-  const texts = {};
-  texts[actions.insertImage] = require('../img/icon_format_media.png');
-  texts[actions.setBold] = require('../img/icon_format_bold.png');
-  texts[actions.setItalic] = require('../img/icon_format_italic.png');
-  texts[actions.insertBulletsList] = require('../img/icon_format_ul.png');
-  texts[actions.insertOrderedList] = require('../img/icon_format_ol.png');
-  texts[actions.insertLink] = require('../img/icon_format_link.png');
-  return texts;
+  // const texts = {};
+  // texts[actions.insertImage] = require('../img/icon_format_media.png');
+  // texts[actions.setBold] = require('../img/icon_format_bold.png');
+  // texts[actions.setItalic] = require('../img/icon_format_italic.png');
+  // texts[actions.insertBulletsList] = require('../img/icon_format_ul.png');
+  // texts[actions.insertOrderedList] = require('../img/icon_format_ol.png');
+  // texts[actions.insertLink] = require('../img/icon_format_link.png');
+  // return texts;
 }
 
 
@@ -52,7 +52,7 @@ export default class RichTextToolbar extends Component {
     };
   }
 
-  componentDidReceiveProps(newProps) {
+  componentWillReceiveProps(newProps) {
     const actions = newProps.actions ? newProps.actions : defaultActions;
     this.setState({
       actions,
@@ -83,14 +83,6 @@ export default class RichTextToolbar extends Component {
     }
   }
 
-  _getButtonSelectedStyle() {
-    return this.props.selectedButtonStyle ? this.props.selectedButtonStyle : styles.defaultSelectedButton;
-  }
-
-  _getButtonUnselectedStyle() {
-    return this.props.unselectedButtonStyle ? this.props.unselectedButtonStyle : styles.defaultUnselectedButton;
-  }
-
   _getButtonIcon(action) {
     if (this.props.iconMap && this.props.iconMap[action]) {
       return this.props.iconMap[action];
@@ -114,8 +106,7 @@ export default class RichTextToolbar extends Component {
               alignItems: 'center',
               justifyContent: 'center',
               marginRight: action === actions.insertImage ? 10 : 0
-            },
-            selected ? this._getButtonSelectedStyle() : this._getButtonUnselectedStyle()
+            }
           ]}
           onPress={() => this._onPress(action, selected)}
       >
@@ -193,10 +184,3 @@ export default class RichTextToolbar extends Component {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  defaultSelectedButton: {
-    backgroundColor: 'red'
-  },
-  defaultUnselectedButton: {}
-});

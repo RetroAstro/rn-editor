@@ -1,2 +1,0 @@
-# suspense
-React Native Project

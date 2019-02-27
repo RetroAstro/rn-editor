@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 
 import { WIDTH, getResponsiveWidth } from '../../common/styles'
+import ImagePicker from 'react-native-image-picker'
 import { RichTextEditor, RichTextToolbar, actions } from './react-native-zss-rich-text-editor'
 import KeyboardSpacer from 'react-native-keyboard-spacer'
 
@@ -33,9 +34,11 @@ const Images = {
   [actions.setStrikethrough]: [require('./images/icon-editor-strikethrough.png'), require('./images/icon-editor-strikethrough-active.png')]
 }
 
-export default class NewDiary extends Component {
+export default class Editor extends Component {
   state = {
     onFocus: false,
+    title: '',
+    content: '',
     preload: {
       [actions.insertImage]: Images[actions.insertImage][0],
       [actions.identifyDiary]: Images[actions.identifyDiary][0],
@@ -48,6 +51,9 @@ export default class NewDiary extends Component {
     }
   }
   onEditorInitialized = () => {
+    this.setFocusOrBlur()
+  }
+  setFocusOrBlur() {
     this.richtext.setContentFocusHandler(() => {
       this.setState({
         onFocus: true
@@ -60,10 +66,41 @@ export default class NewDiary extends Component {
     })
   }
   addImage = () => {
-
+    const options = {
+      title: '添加日记图片',
+      cancelButtonTitle: '取消',
+      takePhotoButtonTitle: '拍摄',
+      chooseFromLibraryButtonTitle: '从相册选择',
+      cameraType: 'back',
+      mediaType: 'photo',
+      quality: 1,
+      includeBase64: true,
+      compressImageQuality: 0.5,
+      allowsEditing: true,
+      storageOptions: {
+        skipBackup: true,
+        cameraRoll: true,
+        waitUntilSaved: true
+      }
+    }
+    ImagePicker.showImagePicker(options, res => {
+      if (!res.didCancel) {
+        this.richtext.insertImage({
+          src: 'data:image/jpeg;base64,' + res.data
+        })
+      }
+    })
   }
   identifyDiary = () => {
-
+    // 识别日记
+  }
+  async componentDidUpdate() {
+    if (this.props.startSaveDiary) {
+      this.props.saveDiary({
+        title: this.state.title,
+        content: await this.richtext.getContentHtml()
+      })
+    }
   }
   render() {
     return (
@@ -71,6 +108,12 @@ export default class NewDiary extends Component {
           <View style={styles.line_separator} />
           <TextInput
             style={styles.text_title}
+            value={this.state.title}
+            onChangeText={(value) => {
+              this.setState({
+                title: value
+              })
+            }}
             placeholder='标题（选填）'
             placeholderTextColor='#aaa'
           />
@@ -87,7 +130,6 @@ export default class NewDiary extends Component {
             }}
             actions={Actions}
             getEditor={() => this.richtext}
-            selectedButtonStyle={{ backgroundColor: '' }}
             iconMap={this.state.preload}
             onPressAddImage={this.addImage}
             onPressIdentifyDiary={this.identifyDiary}
